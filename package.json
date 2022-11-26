@@ -1,5 +1,4 @@
 {
-    "type": "module",
     "name": "tickmc-bot",
     "version": "1.0.0",
     "description": "A general-purpose  bot for TickMC",

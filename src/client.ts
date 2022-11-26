@@ -1,7 +1,7 @@
 import * as discord from "discord.js";
 import * as fs from "fs";
 import * as path from "path";
-import * as files from "src/util/files.js";
+import * as files from "./util/files.js";
 import * as json from "jsonc-parser";
 
 // Config setup
