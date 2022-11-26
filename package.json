@@ -18,6 +18,12 @@
     "homepage": "https://github.com/0tickpulse/tickmc-bot#readme",
     "dependencies": {
         "discord.js": "^14.6.0",
-        "tsconfig-paths": "^4.1.0"
+        "js-yaml": "^4.1.0",
+        "jsonc-parser": "^3.2.0",
+        "tsconfig-paths": "^4.1.0",
+        "ymal": "^0.1.0"
+    },
+    "devDependencies": {
+        "@types/js-yaml": "^4.0.5"
     }
 }
