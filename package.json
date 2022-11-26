@@ -1,0 +1,24 @@
+{
+    "name": "tickmc-bot",
+    "version": "1.0.0",
+    "description": "A general-purpose  bot for TickMC",
+    "main": "lib/client.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/0tickpulse/tickmc-bot.git"
+    },
+    "author": "0TickPulse",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/0tickpulse/tickmc-bot/issues"
+    },
+    "homepage": "https://github.com/0tickpulse/tickmc-bot#readme",
+    "dependencies": {
+        "discord.js": "^14.6.0",
+        "tsconfig-paths": "^4.1.0",
+        "@src": "file:dist"
+    }
+}
