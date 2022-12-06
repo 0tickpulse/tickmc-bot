@@ -1,0 +1,27 @@
+# The main guild. This will be used to register commands and stuff.
+# To get the ID of your guild, enable developer mode in Discord, right click on the server icon, and then click "Copy ID".
+mainGuild: 967071106261459000
+# Whether debug messages should be sent in the console.
+debug: true
+commands:
+    ping:
+        enabled: true
+    info:
+        enabled: true
+        # The info embed will be used as the base.
+        infoEmbeds:
+            threads:
+                title: Please open a thread for this!
+                description: Please open a thread for this! You can do so by clicking the button below.
+# Controls the look of certain embed types.
+baseEmbeds:
+    success:
+        color: 5763719
+    error:
+        color: 15548997
+    info:
+        color: 3447003
+    warning:
+        color: 16705372
+    fatal:
+        color: 10181046
