@@ -49,16 +49,16 @@ export interface tCommand {
  * # Example
  * 
  * ```ts
- * server.registerEvent("ready", () => {
+ * server.registerEvent(discord.Events.ClientReady, () => {
  *    console.log("Bot is ready!");
  * });
  * ```
  * 
- * The above code uses the {@link server.registerEvent} function to register an event handler for the bot.
+ * The above code uses the {@link server.registerEvent} function to register an event handler for the bot. This function then adds a generated tEvent to the bot's event list.
  * 
- * The first field, `"ready"`, is the name of the event.
+ * The first field, `discord.Events.ClientReady`, is the name of the event. The second field, `() => { console.log("Bot is ready!"); }`, is the function that runs when the event is triggered.
  * 
- * The second field, `() => { console.log("Bot is ready!"); }`, is the function that runs when the event is triggered.
+ * This event as a whole triggers when the bot successfully logs in, logging the message "Bot is ready!" to the console.
  * 
  * The function is passed the arguments that the event is triggered with.
  */
@@ -72,5 +72,8 @@ export interface tEvent {
      * @param args The arguments that the event is triggered with. Refer to discord.js documentation.
      */
     run: (...args: any[]) => void;
+    /**
+     * Whether the event should only trigger once.
+     */
     once: boolean;
 }
