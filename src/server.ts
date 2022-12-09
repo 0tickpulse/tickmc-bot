@@ -1,17 +1,17 @@
 import * as discord from "discord.js";
-import * as fs from "fs";
-import * as yaml from "yaml";
+import * as fs from "fs/promises";
 import * as path from "path";
 import * as url from "url";
+import * as yaml from "yaml";
 import * as classes from "./classes/classes.js";
-import * as files from "./util/files.js";
 import * as colors from "./util/colors.js";
+import * as files from "./util/files.js";
 
 // Dirname setup
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 
 // Config setup
-const token = yaml.parse(fs.readFileSync(path.join(__dirname, "..", "config", "token.yml"), "utf8"))["token"];
+const token = yaml.parse(await fs.readFile(path.join(__dirname, "..", "config", "token.yml"), "utf8"))["token"];
 
 /**
  * Gets the bot's token. **Should almost never be used.**
@@ -23,14 +23,14 @@ export const getToken = () => {
 /**
  * Re-scans the configuration file. **Should never be used.**
  */
-const scanConfig = (): { [key: string]: any } => {
-    return yaml.parse(fs.readFileSync(path.join(__dirname, "..", "config", "config.yml"), "utf8"));
+const scanConfig = async (): Promise<{ [key: string]: any }> => {
+    return yaml.parse(await fs.readFile(path.join(__dirname, "..", "config", "config.yml"), "utf8"));
 };
 
 /**
  * The main configuration file of the bot, stored under `config/config.yml`.
  */
-export let config = scanConfig();
+export let config = await scanConfig();
 
 /**
  * Re-scans the configuration file and returns it.
@@ -44,6 +44,16 @@ export const reloadConfig = () => {
 
 // Debuggers
 
+/**
+ * Sends a message to the console.
+ * @param message The message to echo.
+ */
+export const echoLog = (message: string): void => console.log(message);
+
+/**
+ * Sends a debug message. This will only be sent if the `debug` option is set to `true` in the configuration file.
+ * @param message The message to echo.
+ */
 export const echoDebug = (message: string): void => {
     if (config["debug"]) {
         console.log(message);
@@ -68,8 +78,10 @@ client.login(token);
 
 // Event setup
 
+export const events: classes.tEvent[] = [];
+
 /**
- * Registers an event handler for the bot.
+ * Registers an event handler for the bot. This will automatically use try catch to prevent the bot from crashing.
  * @param event The event to register the handler for.
  * @param handler The function to be called when the event is triggered.
  * @param once Whether the handler should be called only once.
@@ -81,12 +93,9 @@ export const registerEvent = (event: keyof discord.ClientEvents, handler: (...ar
         } catch (error) {
             echoError(`Unexpected error while handling event ${event}: ${error}`);
         }
-    }
-    if (once) {
-        client.once(event, tryCatchHandler);
-        return;
-    }
-    client.on(event, tryCatchHandler);
+    };
+    once ? client.once(event, tryCatchHandler) : client.on(event, tryCatchHandler);
+    events.push({ event: event, run: handler, once: once });
 };
 
 files.deepGetFiles(path.join(__dirname, "events")).then((files): void => {
@@ -103,7 +112,7 @@ files.deepGetFiles(path.join(__dirname, "events")).then((files): void => {
 /**
  * An internal list of commands. **Should never be written to.**
  */
-export let commands: classes.tCommand[] = [];
+export const commands: classes.tCommand[] = [];
 
 /**
  * Adds a command to the server's command list. Will not be regsitered onto the bot until {@link registerCommands} is called.

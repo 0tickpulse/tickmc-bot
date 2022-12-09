@@ -21,7 +21,7 @@ import * as server from "../server.js";
  * const embed = buildEmbed("success");
  * ```
  */
-export const buildEmbed = (type: string, ...additionalData: object[]): object => {
+export const buildEmbed = (type: string, ...additionalData: object[]): discord.APIEmbed => {
     let embed: object = {};
     const embedConfig = server.config["embeds"][type] || null;
     if (!embedConfig) {

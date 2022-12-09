@@ -1,12 +1,11 @@
 import * as server from "../server.js";
 import * as discord from "discord.js";
-import * as fs from "fs";
+import * as fs from "fs/promises";
 import * as path from "path";
 import * as url from "url";
 import * as readline from "readline";
 import * as yaml from "yaml";
 import * as paginator from "../util/paginator.js";
-import EventEmitter from "events";
 
 // Dirname setup
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
@@ -105,7 +104,7 @@ server.registerEvent(discord.Events.ClientReady, () => {
     server.echoDebug(`Logged in as ${server.client.user?.tag} (${server.client.user?.id})!`);
 
     // write id to data/id.jsonc
-    fs.writeFileSync(path.join(__dirname, "..", "..", "data", "id.jsonc"), JSON.stringify({ id: server.client.user?.id }));
+    fs.writeFile(path.join(__dirname, "..", "..", "data", "id.jsonc"), JSON.stringify({ id: server.client.user?.id }));
 
     sendInput();
 });

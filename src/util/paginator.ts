@@ -62,7 +62,7 @@ export class Paginator {
     ) {}
 
     /**
-     * Adds an additional page to the paginator.
+     * Adds an additional page to the paginator and returns the paginator object.
      * @param page A new page to add to the paginator.
      */
     public addPage(page: discord.EmbedBuilder) {
@@ -71,10 +71,12 @@ export class Paginator {
     }
 
     /**
-     * Removes a page from the paginator. The page is removed by the specified index.
+     * Removes a page from the paginator and returns the paginator object. The page is removed by the specified index.
+     *
      * @param index The index of the page to remove.
      *
      * An example of this method being used:
+     *
      * ```ts
      * const paginator = new Paginator();
      * paginator.addPage(new MessageEmbed().setTitle("Page 1"));
@@ -92,7 +94,7 @@ export class Paginator {
     }
 
     /**
-     * Sets the button to use for the paginator.
+     * Sets the button to use for the paginator and returns the paginator object.
      * @param buttons An array of two items, where the first item is the button to go to the previous page, and the second item is the button to go to the next page.
      * Keep in mind that in some cases, you would want to only change one button instead of two.
      * To do that, you can use the {@link Paginator.setPreviousPageButton} and {@link Paginator.setNextPageButton} methods instead.
@@ -127,7 +129,7 @@ export class Paginator {
     }
 
     /**
-     * Sets the timeout for the buttons in the paginator.
+     * Sets the timeout for the buttons in the paginator and returns the paginator object.
      * @param timeout The timeout for the buttons. Defaults to 5 minutes (`30000`).
      */
     public setTimeout(timeout: number) {
@@ -136,7 +138,7 @@ export class Paginator {
     }
 
     /**
-     * Sets the "Previous page" button in the paginator.
+     * Sets the "Previous page" button in the paginator and returns the paginator object.
      * @param button The button to go to the previous page.
      * @see Paginator.setButtons
      */
@@ -146,7 +148,7 @@ export class Paginator {
     }
 
     /**
-     * Sets the "Next page" button in the paginator.
+     * Sets the "Next page" button in the paginator and returns the paginator object.
      * @param button The button to go to the next page.
      * @see Paginator.setButtons
      */
@@ -159,9 +161,26 @@ export class Paginator {
      * Sends the paginator to the specified channel. This method will send the first page of the paginator, and add the buttons to the message.
      * Keep in mind that this method will only work if the paginator has at least one page. If the paginator has no pages, this method will throw an error.
      * In addition, this method will return the message that was sent.
+     *
      * @param channel The channel to send the paginator to.
+     * @param firstPageMessage The message to send when the user is on the first page. Defaults to an ephemeral "This is the first page.". **Generally not needed.**
+     * @param lastPageMessage The message to send when the user is on the last page. Defaults to an ephemeral "This is the last page.". **Generally not needed.**
+     *
+     * # Example
+     *
+     * ```ts
+     * const paginator = new Paginator();
+     * paginator.addPage(new MessageEmbed().setTitle("Page 1"));
+     * paginator.addPage(new MessageEmbed().setTitle("Page 2"));
+     * paginator.addPage(new MessageEmbed().setTitle("Page 3"));
+     * const message = await paginator.send(channel);
+     * ```
      */
-    public async send(channel: discord.TextBasedChannel) {
+    public async send(
+        channel: discord.TextBasedChannel,
+        firstPageMessage: string | discord.MessagePayload | discord.InteractionReplyOptions = { content: "This is the first page.", ephemeral: true },
+        lastPageMessage: string | discord.MessagePayload | discord.InteractionReplyOptions = { content: "This is the last page.", ephemeral: true }
+    ) {
         if (this.pages.length === 0) {
             server.echoError("Paginator has no pages.");
         }
@@ -181,13 +200,13 @@ export class Paginator {
         collector.on("collect", async (interaction: discord.ButtonInteraction) => {
             if (interaction.customId === "prev") {
                 if (page === 0) {
-                    interaction.reply({ content: "This is the first page.", ephemeral: true });
+                    interaction.reply(firstPageMessage);
                     return;
                 }
                 page--;
             } else if (interaction.customId === "next") {
                 if (page === this.pages.length - 1) {
-                    interaction.reply({ content: "This is the last page.", ephemeral: true });
+                    interaction.reply(lastPageMessage);
                     return;
                 }
                 page++;

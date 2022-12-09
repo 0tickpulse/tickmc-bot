@@ -1,4 +1,5 @@
-import * as fs from "fs";
+import { Dirent } from "fs";
+import * as fs from "fs/promises";
 import * as path from "path";
 
 /**
@@ -17,9 +18,9 @@ import * as path from "path";
  * It also uses the {@link path.join} method to convert the relative filename `./src` to an absolute filename.
  */
 export const deepGetFiles = async (dir: string): Promise<string[]> => {
-    const files: fs.Dirent[] = fs.readdirSync(dir, { withFileTypes: true });
+    const files: Dirent[] = await fs.readdir(dir, { withFileTypes: true });
     let newFiles: string[] = [];
-    files.forEach(async (file: fs.Dirent) => {
+    files.forEach(async (file: Dirent) => {
         const filePath = path.join(dir, file.name);
         if (file.isDirectory()) {
             newFiles.push(...(await deepGetFiles(filePath)));
