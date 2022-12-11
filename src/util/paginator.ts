@@ -2,8 +2,17 @@ import * as discord from "discord.js";
 import * as server from "../server.js";
 
 /**
+ * # Tick's Paginator
+ *
  * This class is a data structure that holds the data for a paginator, allowing one to send embeds with certain functional buttons on them.
  * These buttons can be used to navigate through the pages of the paginator.
+ *
+ * @param pages The pages of the paginator that the user can navigate through.
+ * @param timeout The timeout for the buttons. Defaults to 5 minutes (`30000`).
+ * After the timeout, the buttons will be disabled.
+ * This is to prevent the buttons from staying on the message forever (which can cause memory leaks).
+ * @param buttons The buttons to use. The first button will be used to go to the previous page, the second button will be used to go to the next page.
+ *
  *
  * Here's an example of the Paginator being used:
  *
@@ -21,7 +30,7 @@ import * as server from "../server.js";
  * In addition, you can specify your own buttons instead of the default ones provided in the class.
  * To do this, you add {@link discord.ButtonBuilder} objects when using the constructor.
  *
- * # Practical use case
+ * ## Practical use case
  *
  * A practical use case for this class is when you want to send a list of items, but you don't want to send them all at once.
  * For example, if you want to send a list of 100 items, you can use this class to send 10 items per page, and let the user navigate through the pages.
@@ -42,19 +51,8 @@ import * as server from "../server.js";
  */
 export class Paginator {
     public constructor(
-        /**
-         * The pages of the paginator that the user can navigate through.
-         */
         public pages: discord.EmbedBuilder[] = [],
-        /**
-         * The timeout for the buttons. Defaults to 5 minutes (`30000`).
-         * After the timeout, the buttons will be disabled.
-         * This is to prevent the buttons from staying on the message forever (which can cause memory leaks).
-         */
         public timeout: number = 300000,
-        /**
-         * The buttons to use. The first button will be used to go to the previous page, the second button will be used to go to the next page.
-         */
         public buttons: [discord.ButtonBuilder, discord.ButtonBuilder] = [
             new discord.ButtonBuilder().setCustomId("prev").setLabel("Previous").setStyle(discord.ButtonStyle.Primary),
             new discord.ButtonBuilder().setCustomId("next").setLabel("Next").setStyle(discord.ButtonStyle.Primary)
@@ -166,7 +164,7 @@ export class Paginator {
      * @param firstPageMessage The message to send when the user is on the first page. Defaults to an ephemeral "This is the first page.". **Generally not needed.**
      * @param lastPageMessage The message to send when the user is on the last page. Defaults to an ephemeral "This is the last page.". **Generally not needed.**
      *
-     * # Example
+     * ## Example
      *
      * ```ts
      * const paginator = new Paginator();

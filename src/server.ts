@@ -69,8 +69,6 @@ export const echoError = (error: string): void =>
         `${colors.basic.red.fore}!!! ${colors.basic.white.fore}An error has occured!\n${colors.basic.gray.fore}    Error message: ${colors.basic.white.fore}${error}${colors.codes.reset}`
     );
 
-echoError("test error");
-
 // Client setup
 
 export const client = new discord.Client({ intents: [discord.GatewayIntentBits.Guilds] });
@@ -139,12 +137,14 @@ export const importCommands = async () => {
 export const registerCommands = async (): Promise<void> => {
     try {
         const rest = new discord.REST().setToken(token);
-        await rest.put(discord.Routes.applicationGuildCommands(client.user?.id as string, config["mainGuild"]), {
+        const id = client.user?.id as string;
+        const guild = config["mainGuild"].toString();
+        await rest.put(discord.Routes.applicationGuildCommands(id, guild), {
             body: commands.map((command) => command.data.toJSON())
         });
         echoDebug("Successfully registered application commands.");
     } catch (error: any) {
-        echoError(`Failed to register application commands - ${error}`);
+        console.error(error);
     }
 };
 

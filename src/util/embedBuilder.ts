@@ -22,15 +22,12 @@ import * as server from "../server.js";
  * ```
  */
 export const buildEmbed = (type: string, ...additionalData: object[]): discord.APIEmbed => {
-    let embed: object = {};
+    let embed: discord.APIEmbed = {};
     const embedConfig = server.config["embeds"][type] || null;
     if (!embedConfig) {
         server.echoError(`Embed type "${type}" not found.`);
         return {};
     }
     embed = embedConfig;
-    return Object.assign(
-        embed,
-        additionalData.reduce((a, b) => Object.assign(a, b))
-    );
+    return { ...embed, ...additionalData };
 };
