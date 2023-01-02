@@ -4,6 +4,7 @@ import * as path from "path";
 import * as url from "url";
 import * as yaml from "yaml";
 import * as classes from "./classes/classes.js";
+import { BotConfig } from "./configLayout.js";
 import * as colors from "./util/colors.js";
 import * as files from "./util/files.js";
 
@@ -23,7 +24,7 @@ export const getToken = () => {
 /**
  * Re-scans the configuration file. **Should never be used.**
  */
-const scanConfig = async (): Promise<{ [key: string]: any }> => {
+const scanConfig = async (): Promise<BotConfig> => {
     return yaml.parse(await fs.readFile(path.join(__dirname, "..", "config", "config.yml"), "utf8"));
 };
 
@@ -35,9 +36,9 @@ export let config = await scanConfig();
 /**
  * Re-scans the configuration file and returns it.
  */
-export const reloadConfig = () => {
+export const reloadConfig = async () => {
     echoDebug("Reloading config...");
-    config = scanConfig();
+    config = await scanConfig();
     echoDebug("Config transferred from file to memory.");
     return config;
 };
@@ -89,7 +90,7 @@ export const registerEvent = (event: keyof discord.ClientEvents, handler: (...ar
         try {
             handler(...args);
         } catch (error) {
-            echoError(`Unexpected error while handling event ${event}: ${error}`);
+            echoError(`Unexpected error while handling event ${event}: ${error}` + (error as Error).stack ?? "");
         }
     };
     once ? client.once(event, tryCatchHandler) : client.on(event, tryCatchHandler);
@@ -114,11 +115,9 @@ export const commands: classes.tCommand[] = [];
 
 /**
  * Adds a command to the server's command list. Will not be regsitered onto the bot until {@link registerCommands} is called.
- * @param command The command.
- * @param run The function to be called when the command is triggered.
  */
-export const addCommand = (command: discord.SlashCommandBuilder, run: (interaction: discord.CommandInteraction) => void): void => {
-    commands.push({ data: command, run: run });
+export const addCommand = (command: classes.tCommand): void => {
+    commands.push(command);
 };
 
 /**
@@ -138,7 +137,7 @@ export const registerCommands = async (): Promise<void> => {
     try {
         const rest = new discord.REST().setToken(token);
         const id = client.user?.id as string;
-        const guild = config["mainGuild"].toString();
+        const guild = config["mainGuild"];
         await rest.put(discord.Routes.applicationGuildCommands(id, guild), {
             body: commands.map((command) => command.data.toJSON())
         });
@@ -167,3 +166,21 @@ export const exit = (code: number = 0): void => {
     client.destroy();
     process.exit(code);
 };
+
+files.deepGetFiles(path.join(__dirname, "commands")).then((files): void => {
+    files.forEach((file: string): void => {
+        if (path.extname(file) !== ".js") {
+            return;
+        }
+        import(url.pathToFileURL(file).toString());
+    });
+});
+
+/**
+ * A map of global ratelimits for slash commands in milliseconds.
+ */
+export const globalSlashCommandRatelimits: Map<classes.tCommand, number> = new Map();
+/**
+ * A map of per-user ratelimits for slash commands in milliseconds.
+ */
+export const perUserSlashCommandRatelimits: Map<discord.User, Map<classes.tCommand, number>> = new Map();

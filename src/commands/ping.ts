@@ -1,7 +1,19 @@
-import { CommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import * as server from "../server.js";
-import { buildEmbed } from "../util/embedBuilder.js";
+import buildEmbed from "../util/buildEmbed.js";
 
-server.addCommand(new SlashCommandBuilder().setName("ping").setDescription("Replies with Pong!"), (interaction: CommandInteraction) => {
-    interaction.reply({ embeds: [buildEmbed("success", { description: "Pong!" })] });
+server.addCommand({
+    data: new SlashCommandBuilder().setName("ping").setDescription("Replies with Pong!"),
+    run: (interaction: ChatInputCommandInteraction) => {
+        interaction.editReply({
+            embeds: [
+                buildEmbed("success", {
+                    title: "Pong!",
+                    description: `API Latency: ${Math.round(server.client.ws.ping)}ms\nBot latency: ${Math.round(
+                        Date.now() - interaction.createdTimestamp
+                    )}ms`
+                })
+            ]
+        });
+    }
 });

@@ -1,6 +1,6 @@
 # The main guild. This will be used to register commands and stuff.
 # To get the ID of your guild, enable developer mode in Discord, right click on the server icon, and then click "Copy ID".
-mainGuild: 967071106261459000
+mainGuild: "967071106261458954"
 # Whether debug messages should be sent in the console.
 debug: true
 commands:
@@ -10,18 +10,43 @@ commands:
         enabled: true
         # The info embed will be used as the base.
         infoEmbeds:
-            threads:
+            threads,thread,makethread:
                 title: Please open a thread for this!
                 description: Please open a thread for this! You can do so by clicking the button below.
+                image:
+                    url: https://resources.tick-mc.net/images/threads.png
+            itworks,works:
+                title: It works! Or does it?
+                description: Just because it works doesn't mean that it is correct. Please make sure that you have read the documentation and that you have followed the instructions. If not, many unexpected issues may occur even if on the surface it looks like it works.
+            ancient,ancientversion,1.8:
+                title: Ancient version
+                description: You are using an ancient version of Minecraft released <t:1409587200:R>. Please update to a newer version.
+            channel,channels:
+                title: Channels
+                description: Please use the correct channels for the correct things. Do not ask questions in <#967427687448739871>. Generally, information about a channel is displayed in it's description. If you are still unsure, please ask a staff member.
+    reload:
+        enabled: true
+    generatelcclore:
+        enabled: true
 # Controls the look of certain embed types.
 baseEmbeds:
     success:
         color: 5763719
+        thumbnail:
+            url: https://resources.tick-mc.net/images/success.png
     error:
         color: 15548997
+        thumbnail:
+            url: https://resources.tick-mc.net/images/error.png
     info:
         color: 3447003
+        thumbnail:
+            url: https://resources.tick-mc.net/images/info.png
     warning:
         color: 16705372
+        thumbnail:
+            url: https://resources.tick-mc.net/images/warning.png
     fatal:
         color: 10181046
+        thumbnail:
+            url: https://resources.tick-mc.net/images/fatal.png

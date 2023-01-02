@@ -1,6 +1,15 @@
 import * as discord from "discord.js";
 import * as server from "../server.js";
 
+const buildEmbed = (type: string, ...additionalData: discord.APIEmbed[]): discord.APIEmbed => {
+    const embedConfig: discord.APIEmbed = server.config.baseEmbeds?.[type] ?? undefined;
+    if (embedConfig === undefined) {
+        server.echoError(`Embed type "${type}" not found.`);
+        return {};
+    }
+    return Object.assign(embedConfig, ...additionalData);
+};
+
 /**
  * Builds an embed from a specified type. This type is used to determine certain properties, and is user-specified in that the function reads the embed type data from {@link server.config}.
  * @param type The type of embed to create. This can be any type from {@link server.config}.
@@ -21,13 +30,8 @@ import * as server from "../server.js";
  * const embed = buildEmbed("success");
  * ```
  */
-export const buildEmbed = (type: string, ...additionalData: object[]): discord.APIEmbed => {
-    let embed: discord.APIEmbed = {};
-    const embedConfig = server.config["embeds"][type] || null;
-    if (!embedConfig) {
-        server.echoError(`Embed type "${type}" not found.`);
-        return {};
-    }
-    embed = embedConfig;
-    return { ...embed, ...additionalData };
+export default buildEmbed;
+
+export const reallySimpleEmbed = (type: string, description: string): discord.APIEmbed => {
+    return buildEmbed(type, { description });
 };

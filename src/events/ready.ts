@@ -4,21 +4,32 @@ import * as fs from "fs/promises";
 import * as path from "path";
 import * as url from "url";
 import * as readline from "readline";
-import * as yaml from "yaml";
 import * as paginator from "../util/paginator.js";
+import * as repl from "node:repl";
 
 // Dirname setup
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+const inputHistory: string[] = [];
 
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const sendInput = () => {
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout, history: inputHistory });
     rl.question(">> ", async (input: string) => {
+        inputHistory.push(input);
         const split = input.trim().split(" ");
         const command = split[0];
         const args = split.slice(1);
         switch (command.toLowerCase()) {
             case "exit":
                 server.exit();
+            case "repl":
+                rl.close();
+                const replServer = repl.start({ prompt: "REPL >> " });
+                replServer.context.server = server;
+                replServer.context.discord = discord;
+                replServer.on("exit", () => {
+                    sendInput();
+                });
+                return;
             case "reload":
                 server.reloadConfig();
                 break;
@@ -67,35 +78,18 @@ const sendInput = () => {
 
                 p.send(server.client.channels.cache.get("967427683506077767") as discord.TextChannel);
                 break;
-            case "printconfig":
-                if (args.length > 0) {
-                    let conf = server.config;
-                    let hasError = false;
-                    const key = args[0].split(".");
-                    key.forEach((k) => {
-                        if (conf[k]) {
-                            conf = conf[k];
-                        } else {
-                            if (!hasError) {
-                                server.echoError(`Key ${k} of ${key.join(".")} not found.`);
-                            }
-                            hasError = true;
-                        }
-                    });
-                    if (!hasError) {
-                        console.log(`Value for key ${key.join(".")}:\n${yaml.stringify(conf)}`);
-                    }
-                    break;
-                }
-                console.log(yaml.stringify(server.config));
+            case "appcmdlist":
+                const commands = server.commands.map((command) => command.data.name);
+                console.log(commands.join(", "));
                 break;
             case "help":
-                console.log("Available commands: exit, reload, registerCommands, paginationTest, printConfig, help");
+                console.log("Available commands: exit, repl, reload, registerCommands, paginationTest, appcmdlist, help");
                 break;
             default:
                 server.echoError(`Unknown command "${command}". Type "help" for a list of commands.`);
                 break;
         }
+        rl.close();
         sendInput();
     });
 };
